@@ -15,6 +15,7 @@ description: 介绍了怎么样在 vue3 组合式 API 中使用 vee-validator �
 本文记录下如何使用`vee-validator`进行表单验证  
 
 代码模板如下：  
+
 ```html
 <form v-show="isLogin">
   <!-- Email -->
@@ -42,68 +43,69 @@ description: 介绍了怎么样在 vue3 组合式 API 中使用 vee-validator �
 
 1. 在`script`中定义校验规则，并定义对应的响应式字段和提交方法  
 
-```javascript
-import { useForm } from 'vee-validate';
-import { z } from 'zod';
-import { toTypedSchema } from '@vee-validate/zod';
+    ```javascript
+    import { useForm } from 'vee-validate';
+    import { z } from 'zod';
+    import { toTypedSchema } from '@vee-validate/zod';
 
-const validationSchema = toTypedSchema(
-  z.object({
-    email: z.string().min(1, '邮箱必填').email('格式无效'),
-    password: z.string().min(6, '密码至少 6 位').max(16, '密码最多 16 位'),
-  })
-);
+    const validationSchema = toTypedSchema(
+      z.object({
+        email: z.string().min(1, '邮箱必填').email('格式无效'),
+        password: z.string().min(6, '密码至少 6 位').max(16, '密码最多 16 位'),
+      })
+    );
 
 
-const loginForm = useForm({
-  validationSchema,
-});
+    const loginForm = useForm({
+      validationSchema,
+    });
 
-const [loginEmail, loginEmailAttrs] = loginForm.defineField('email');
-const [loginPassword, loginPasswordAttrs] = loginForm.defineField('password');
+    const [loginEmail, loginEmailAttrs] = loginForm.defineField('email');
+    const [loginPassword, loginPasswordAttrs] = loginForm.defineField('password');
 
-const submitLogin = loginForm.handleSubmit((values) => {
-  console.log('通过校验', values)
-})
-```
+    const submitLogin = loginForm.handleSubmit((values) => {
+      console.log('通过校验', values)
+    })
+    ```
 
 2. `html`中使用 `v-model` 和 `v-bind` 分别绑定值和校验对象，并在下方添加显示错误提示的结构  
 
-改动点：
-  1. `v-model="loginEmail"`
-  2. `v-bind="loginEmailAttrs"`
-  3. `<span class="text-red-500">{{ loginForm.errors.value.email }}</span>`
-  4. 表单提交： `<form v-show="isLogin" @submit.prevent="submitLogin">`
+    改动点：
 
-```html
-<!-- Login Form -->
-<form v-show="isLogin" @submit.prevent="submitLogin">
-  <!-- Email -->
-  <div class="mb-3">
-    <label class="inline-block mb-2">Email</label>
-    <input type="email"
-      v-model="loginEmail"
-      v-bind="loginEmailAttrs"
-      class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-      placeholder="Enter Email" />
-    <span class="text-red-500">{{ loginForm.errors.value.email }}</span>
-  </div>
-  <!-- Password -->
-  <div class="mb-3">
-    <label class="inline-block mb-2">Password</label>
-    <input type="password"
-      v-model="loginPassword"
-      v-bind="loginPasswordAttrs"
-      class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-      placeholder="Password" />
-    <span class="text-red-500">{{ loginForm.errors.value.password }}</span>
-  </div>
-  <button type="submit"
-    class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition hover:bg-purple-700">
-    Submit
-  </button>
-</form>
-```
+      1. `v-model="loginEmail"`
+      2. `v-bind="loginEmailAttrs"`
+      3. `<span class="text-red-500">{{ loginForm.errors.value.email }}</span>`
+      4. 表单提交： `<form v-show="isLogin" @submit.prevent="submitLogin">`
+
+    ```html
+    <!-- Login Form -->
+    <form v-show="isLogin" @submit.prevent="submitLogin">
+      <!-- Email -->
+      <div class="mb-3">
+        <label class="inline-block mb-2">Email</label>
+        <input type="email"
+          v-model="loginEmail"
+          v-bind="loginEmailAttrs"
+          class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+          placeholder="Enter Email" />
+        <span class="text-red-500">{{ loginForm.errors.value.email }}</span>
+      </div>
+      <!-- Password -->
+      <div class="mb-3">
+        <label class="inline-block mb-2">Password</label>
+        <input type="password"
+          v-model="loginPassword"
+          v-bind="loginPasswordAttrs"
+          class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+          placeholder="Password" />
+        <span class="text-red-500">{{ loginForm.errors.value.password }}</span>
+      </div>
+      <button type="submit"
+        class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition hover:bg-purple-700">
+        Submit
+      </button>
+    </form>
+    ```
 
 ## 原理解析
 
@@ -132,11 +134,13 @@ const attrs = {
 ```
 
 等价于：  
+
 ```vue
 <input :name="attrs.name" :id="attrs.id" :class="attrs.class" />
 ```
 
 ### 2. 事件处理器（以 `on` 开头的属性）  
+
 如果键名以 `on` 开头（如 `onBlur`、`onChange`、`onInput`），Vue 会将其转换为事件监听器：  
 
 ```javascript
@@ -153,8 +157,8 @@ const attrs = {
 ```
 
 等价于：
-```vue
 
+```vue
 <input 
   :name="attrs.name"
   @blur="attrs.onBlur"
@@ -165,7 +169,6 @@ const attrs = {
 ```
 
 ## vee-validate 的 `attrs` 对象
-
 
 `defineField` 返回的 `attrs` 对象通常包含：
 
@@ -183,6 +186,7 @@ loginEmailAttrs = {
 ## 实际例子
 
 假设 `loginEmailAttrs` 是：
+
 ```javascript
 {
   name: 'email',
@@ -193,11 +197,13 @@ loginEmailAttrs = {
 ```
 
 当你写：
+
 ```vue
 <input v-bind="loginEmailAttrs" />
 ```
 
 Vue 会将其展开为：
+
 ```vue
 <input 
   name="email"
@@ -208,6 +214,7 @@ Vue 会将其展开为：
 ```
 
 下面是一个完整说明此特性的例子
+
 ```vue
 <template>
   <div>
