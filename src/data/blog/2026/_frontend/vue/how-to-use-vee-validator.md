@@ -2,7 +2,7 @@
 title: 怎么样在 vue3 组合式 API 中使用 vee-validator 进行表单校验
 author: Walter
 pubDatetime: 2026-01-06T06:00:00Z
-featured: true
+featured: false
 draft: false
 tags:
   - vue
