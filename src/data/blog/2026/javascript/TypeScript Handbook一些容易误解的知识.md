@@ -64,3 +64,23 @@ description: 两年前，我通过阅读官方Handbook的方式第一次了解�
     }
     ```
 
+3. 类型谓词（Type Predicates）
+
+    ```ts
+    // ❌ 普通函数返回 boolean，TypeScript 不知道类型缩窄
+    function isCat(animal: Animal): boolean {
+      return 'meow' in animal
+    }
+    // ✅ 使用类型谓词
+    function isCat(animal: Animal): animal is Cat {
+      return 'meow' in animal
+    }
+
+    function makeSound(animal: Animal) {
+      if (isCat(animal)) {
+        animal.meow()  // ✅ 正确！TypeScript 知道这里是 Cat
+      } else {
+        animal.bark()  // ✅ 这里自动推断为 Dog
+      }
+    }
+    ````
