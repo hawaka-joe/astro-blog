@@ -6,10 +6,8 @@ featured: false
 draft: false
 tags:
   - typescript
-description: TypeScript Handbook 查漏补缺
+description: 两年前，我通过阅读官方Handbook的方式第一次了解了 TS，现在我有了两年的 TS 开发经验，回头重读，不知会有什么样的收获，开此帖记录下
 ---
-
-## TypeScript Handbook 查漏补缺
 
 两年前，我通过阅读官方Handbook的方式第一次了解了 TS，现在我有了两年的 TS 开发经验，回头重读，不知会有什么样的收获，开此帖记录下
 
