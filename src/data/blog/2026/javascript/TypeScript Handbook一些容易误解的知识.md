@@ -181,3 +181,13 @@ description: 两年前，我通过阅读官方Handbook的方式第一次了解�
     // push 会返回新数组的长度（number），但 forEach 并不在乎
     src.forEach((el) => dst.push(el));
     ```
+
+## Modules
+
+1. 在 ES 模块中，一个没有任何顶级导入或导出声明的文件将被视为脚本，其内容可在全局范围内使用
+如果你的文件当前没有任何 import 语句或 export 语句，但你想将其视为模块，请添加以下代码行：
+
+    ```ts
+    export {}
+    ```
+2.
