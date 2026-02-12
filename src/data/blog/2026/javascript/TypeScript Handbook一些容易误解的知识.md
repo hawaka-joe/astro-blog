@@ -84,3 +84,100 @@ description: 两年前，我通过阅读官方Handbook的方式第一次了解�
       }
     }
     ````
+
+## More on Functions
+
+1. 函数可以有属性，`type GreetFunction = (a: string) => void;`无法包含属性信息，因此可以采取下面的写法
+
+    ```ts
+    type DescribableFunction = {
+      description: string;
+      (someArg: number): boolean;
+    }
+
+    function doSomething(fn: DescribableFunction) {
+      console.log(fn.description + " returned " + fn(6));
+    }
+    
+    function myFunc(someArg: number) {
+      return someArg > 3;
+    }
+    myFunc.description = "default description";
+    
+    doSomething(myFunc);
+    ```
+
+2. 如何表示一个函数的类型是构造函数呢，使用`new`关键字，如下：
+
+    ```ts
+    type SomeConstructor = {
+      new(someArg: string): SomeObject
+    }
+    ```
+
+    这两种可以同时存在
+
+    ```ts
+    interface CallOrConstruct {
+      (n?: number): string;
+      new (s: string): Date;
+    }
+    ```
+
+3. 下面这个函数是无法通过 ts 校验的，想想为什么
+
+    ```ts
+    function minimumLength<Type extends { length: number }>(
+      obj: Type,
+      minimum: number
+    ): Type {
+      if (obj.length >= minimum) {
+        return obj;
+      } else {
+        // Type '{ length: number; }' is not assignable to type 'Type'
+        return { length: minimum };
+      }
+    }
+    ```
+
+4. 不要在回调函数中使用可选参数，让回调函数接受所有的参数，自己决定要使用哪些参数
+5. 如何在 TypeScript 函数中显式声明 this 的类型：
+
+    ```ts
+    interface User {
+      id: number;
+      admin: boolean;
+    }
+
+    interface DB {
+      filterUsers(filter: () => boolean): User[];
+      users: User[]
+    }
+
+    const db: DB = {
+      users: [
+        { id: 1, admin: true },
+        { id: 2, admin: false },
+        { id: 3, admin: true },
+      ] as User[],
+
+      filterUsers: function (filter) {
+        return this.users.filter(filter);
+      },
+    };
+
+    // 正确：使用普通函数，TS 知道这里的 this 指向当前被校验的那个 User
+    const admins = db.filterUsers(function (this: User) {
+      return this.admin; // 这里的 this 就是上面 filter.call(u) 传进来的 u
+    });
+    ```
+
+6. 一个声明为返回 void 的函数类型，可以被赋值为一个有返回值的函数
+
+    ```ts
+    const src = [1, 2, 3];
+    const dst = [0];
+
+    // push 会返回新数组的长度（number），但 forEach 并不在乎
+    src.forEach((el) => dst.push(el));
+    ```
