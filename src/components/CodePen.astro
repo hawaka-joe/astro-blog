@@ -1,0 +1,49 @@
+---
+interface Props {
+  html?: string;
+  css?: string;
+  js?: string;
+  height?: number;
+  editable?: boolean;
+  defaultTab?: string;
+  theme?: "light" | "dark";
+}
+
+const {
+  html = "",
+  css = "",
+  js = "",
+  height = 400,
+  editable = true,
+  defaultTab = "html,result",
+  theme,
+} = Astro.props;
+
+const themeId = theme === "light" ? "light" : theme === "dark" ? "dark" : undefined;
+---
+
+<div
+  class="codepen not-prose my-6"
+  data-prefill
+  data-editable={editable ? "true" : "false"}
+  data-height={height}
+  data-default-tab={defaultTab}
+  {...themeId && { "data-theme-id": themeId }}
+  style={`height: ${height}px; overflow: auto;`}
+>
+  {html && <pre data-lang="html">{html}</pre>}
+  {css && <pre data-lang="css">{css}</pre>}
+  {js && <pre data-lang="js">{js}</pre>}
+</div>
+
+<script is:inline data-astro-rerun>
+  (() => {
+    if (document.querySelector("script[data-codepen-embed]")) return;
+
+    const script = document.createElement("script");
+    script.src = "https://public.codepenassets.com/embed/index.js";
+    script.async = true;
+    script.dataset.codepenEmbed = "";
+    document.head.appendChild(script);
+  })();
+</script>

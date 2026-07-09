@@ -1,0 +1,170 @@
+---
+title: 浅析外边距折叠
+author: Walter
+pubDatetime: 2026-07-09T10:00:00Z
+featured: false
+draft: false
+tags:
+  - frontend
+  - css
+description: 本文介绍了外边距折叠发生的三种原因以及一些避免外边距折叠的方法
+---
+
+import CodePen from "@/components/CodePen.astro";
+
+CSS 诞生之初主要是用于文字排版，在当时页面以文字为主的背景下，外边距折叠是一项有利于布局的特性，有利于保持页面间距的一致性，
+例如能够防止标题和中文之间的间隔过大  
+
+外边距折叠会在以下三种情况发生
+- 相邻的兄弟元素间会发生外边距折叠
+- 空元素的上下外边距会发生折叠
+- 父元素与第一个或最后一个子元素之间发生外边距折叠
+
+## 相邻的兄弟元素间会发生外边距折叠
+
+第一个元素的下边距为 50px， 第二个元素上边距为 20px，但是两个元素之间实际的间隔并不是 70px，而是 50px，
+由此可以看出这两个元素之间发生了外边距折叠
+
+
+<CodePen
+  html={
+    `<div class="wrapper">
+
+      <div class="box example1">
+        margin-top: 50px; margin-bottom: 50px;
+      </div>
+
+      <div class="box example2">
+        margin-top: 20px; margin-bottom: 20px;
+      </div>
+        
+      </div>`
+  }
+  css={`.wrapper {
+      border: 5px dotted black;
+    }
+
+    .example1 {
+      margin: 50px 0 50px 0;
+    }
+
+    .example2 {
+      margin: 20px 0 20px 0;
+    }
+
+    body {
+      font: 1.4em/1.3 "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+      margin: 2em 3em;
+    }
+
+    .box {
+      background-color: rgb(55,55,110);
+      color: white;
+      padding: 20px;
+      border-radius: .5em;
+    }`}
+  height={320}
+/>
+
+## 空元素的上下外边距会发生折叠
+
+下方示例中两个具有背景色的 box（高度为 50px） 中间存在一个空元素，这个空元素的上下外边距都是 50px，
+观察可以看出来这两个 box 之间的间隔为 50px 而不是 50px + 50px，由此可以看出来这个空元素的上下边距发生了折叠
+
+<CodePen
+  html={
+    `<div class="wrapper">
+
+      <div class="box">
+        A box
+      </div>
+
+      <div class="box empty"></div>
+
+      <div class="box">
+        Another box
+      </div>
+        
+      </div>`
+  }
+  css={`.wrapper {
+      border: 5px dotted black;
+    }
+
+    body {
+      font: 1.4em/1.3 "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+
+    }
+
+    .box {
+      height: 50px;
+      background-color: rgb(55,55,110);
+      color: white;
+      border-radius: .5em;
+    }
+
+    .empty {
+      height: auto;
+      margin: 50px 0 50px 0;
+    }`}
+  height={320}
+/>
+
+## 父元素与第一个或最后一个子元素之间发生外边距折叠
+
+父元素内的第一个和最后一个元素都设置了 垂直方向上的margin
+第一个和最后一个子元素的垂直外边距，会与父元素的外边距发生折叠，因此看起来像是父元素内部没有留出相应间距。
+
+<CodePen
+  html={
+    `<div class="wrapper">
+
+      <div class="box">
+        Item 1
+      </div>
+
+      <div class="box">
+        Item 2
+      </div>
+
+      <div class="box">
+        Item 3
+      </div>
+        
+      </div>`
+  }
+  css={`.wrapper {
+  outline: 1px solid red;
+}
+
+.box {
+  margin: 50px;
+}
+
+body {
+  font: 1.4em/1.3 "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+  margin: 2em 3em;
+}
+
+.box {
+  background-color: rgb(55,55,110);
+  color: white;
+  padding: 20px;
+  border-radius: .5em;
+}`}
+  height={320}
+/>
+
+## 如何防止外边距发生折叠
+
+- 浮动或者绝对定位的元素不会发生折叠
+- 为空元素添加 padding 或者 border 可以防止其上下边距发生折叠
+- 为父元素添加 border、padding 可以防止其子元素折叠
+- 为元素创建 Block Formatting Context（BFC），可以阻止其内部外边距与外部外边距发生折叠
+
+前面三点都好理解，那么如何创建一个 BFC 呢
+- 当你使用 flex 或者 grid 布局时，你就创建了一个 BFC
+- `overflow: auto` 也会在对应的元素上创建 BFC
+- `display: flow-root` 也会创建 BFC
+
+其中最推荐的方式是使用`display: flow-root`，因为他不像前两种方式会产生一些副作用
